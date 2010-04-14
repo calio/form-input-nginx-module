@@ -1,0 +1,10 @@
+ngx_form_input 模块。
+此模块主要完成 "application/x-www-form-urlencoded" 格式的 HTTP POST 请求体的解析，并将其中的 field 值映射到指定的 nginx 变量。一个例子是
+
+     location /foo {
+          set_form_input $data;    # read "data" field into $data
+          set_form_input $foo foo; # read "foo" field into $foo
+          ...
+     }
+
+    它亦是基于 NDK set_var 的模块。

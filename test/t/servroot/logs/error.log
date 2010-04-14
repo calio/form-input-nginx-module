@@ -1,0 +1,5 @@
+2010/04/07 09:44:34 [notice] 12146#0: using the "epoll" event method
+2010/04/07 09:44:34 [notice] 12146#0: nginx/0.7.65
+2010/04/07 09:44:34 [notice] 12146#0: built by gcc 4.3.3 (Ubuntu 4.3.3-5ubuntu4) 
+2010/04/07 09:44:34 [notice] 12146#0: OS: Linux 2.6.28-18-generic
+2010/04/07 09:44:34 [notice] 12146#0: getrlimit(RLIMIT_NOFILE): 1024:1024
