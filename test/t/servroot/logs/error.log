@@ -1,5 +1,7 @@
-2010/04/07 09:44:34 [notice] 12146#0: using the "epoll" event method
-2010/04/07 09:44:34 [notice] 12146#0: nginx/0.7.65
-2010/04/07 09:44:34 [notice] 12146#0: built by gcc 4.3.3 (Ubuntu 4.3.3-5ubuntu4) 
-2010/04/07 09:44:34 [notice] 12146#0: OS: Linux 2.6.28-18-generic
-2010/04/07 09:44:34 [notice] 12146#0: getrlimit(RLIMIT_NOFILE): 1024:1024
+2010/04/21 17:57:28 [notice] 21493#0: using the "epoll" event method
+2010/04/21 17:57:28 [notice] 21493#0: nginx/0.7.65
+2010/04/21 17:57:28 [notice] 21493#0: built by gcc 4.3.3 (Ubuntu 4.3.3-5ubuntu4) 
+2010/04/21 17:57:28 [notice] 21493#0: OS: Linux 2.6.28-18-generic
+2010/04/21 17:57:28 [notice] 21493#0: getrlimit(RLIMIT_NOFILE): 1024:1024
+body:foo=bar
+v[0]:foo
