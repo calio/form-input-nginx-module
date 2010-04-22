@@ -4,5 +4,5 @@ cd ~/ngx
 make -j2
 sudo make install
 sudo nginx
-curl -d "a=calio&b=agentzh&c=cc&d=debug"  localhost:8088
+curl -v -d ""  localhost:8088/bar3
 cat /usr/local/nginx/logs/error.log
