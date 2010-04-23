@@ -1,7 +1,0 @@
-2010/04/22 16:40:46 [notice] 24075#0: using the "epoll" event method
-2010/04/22 16:40:46 [notice] 24075#0: nginx/0.7.65
-2010/04/22 16:40:46 [notice] 24075#0: built by gcc 4.3.3 (Ubuntu 4.3.3-5ubuntu4) 
-2010/04/22 16:40:46 [notice] 24075#0: OS: Linux 2.6.28-18-generic
-2010/04/22 16:40:46 [notice] 24075#0: getrlimit(RLIMIT_NOFILE): 1024:1024
-form_input *** rewrite phase:form_input_handler at ../form-input-nginx-module/src/ngx_http_form_input_module.c line 271.
-form_input *** ndk handler:set form input handler at ../form-input-nginx-module/src/ngx_http_form_input_module.c line 95.
