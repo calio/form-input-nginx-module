@@ -130,7 +130,7 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     for (len = 0; chain != NULL; chain = chain->next) {
         len += (ngx_int_t)(chain->buf->last - chain->buf->start);
     }
-    dd("len=%d", len);
+    dd("len=%d", (int)len);
     if (len == 0) {
         res->len = 0;
         res->data = (u_char*)"";
@@ -152,13 +152,13 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     p = buf;
     last = p + len;
 
-    dd("buf=%x", (unsigned int)buf);
-    dd("last=%x", (unsigned int)last);
+    dd("buf=%p", buf);
+    dd("last=%p", last);
     for ( /* void */; p < last; p++) {
         /* we need '=' after name, so drop one char from last */
 
         p = ngx_strlcasestrn(p, last - 1, v->data, v->len - 1);
-        dd("%x", (unsigned int)p);
+        dd("%p", p);
         if (p == NULL) {
             res->data = (u_char*)"";
             res->len = 0;
@@ -288,8 +288,8 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     dd("rewrite phase:form_input_handler");
     ngx_http_form_input_loc_conf_t  *lcf;
     ngx_http_form_input_ctx_t       *ctx;
-    ngx_str_t                       value;
-
+    ngx_str_t                        value;
+    ngx_int_t                        rc;
 
     lcf = ngx_http_get_module_loc_conf(r, ngx_http_form_input_module);
     if (lcf->flag == 0 || lcf->flag == NGX_CONF_UNSET) {
@@ -335,10 +335,18 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         ctx->done = NGX_BUSY;
         ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
     } else {
+        if (ctx->done) {
+            return NGX_DECLINED;
+        }
         dd("already have ctx");
     }
     dd("start to read request_body");
-    ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
+
+    rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
+
+    if (rc == NGX_AGAIN) {
+        return NGX_AGAIN;
+    }
 
     return NGX_DECLINED;
 }
@@ -377,6 +385,7 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 */
     dd("post read done");
     ctx->done = NGX_DONE;
+    ngx_http_core_run_phases(r);
 }
 
 
