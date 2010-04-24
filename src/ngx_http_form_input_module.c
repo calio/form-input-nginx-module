@@ -337,12 +337,18 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     } else {
         if (ctx->done) {
             return NGX_DECLINED;
+        } else {
+            return NGX_AGAIN;
         }
         dd("already have ctx");
     }
     dd("start to read request_body");
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
+
+    if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+        return rc;
+    }
 
     if (rc == NGX_AGAIN) {
         return NGX_AGAIN;
