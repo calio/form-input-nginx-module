@@ -179,6 +179,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             return NGX_OK;
         }
     }
+
     return NGX_OK;
 }
 
@@ -193,12 +194,6 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
     ngx_http_form_input_loc_conf_t          *flcf = conf;
     dd("set form input conf handler");
 
-    /*if (flcf == NULL) {
-        dd("flcf is null");
-        return NGX_CONF_OK;
-    }
-    dd("flcf->enabled is 1");
-    */
     flcf->enabled = 1;
 
     filter.type = NDK_SET_VAR_MULTI_VALUE;
@@ -301,6 +296,16 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
+    ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
+
+    if (ctx != NULL) {
+        if (ctx->done) {
+            return NGX_DECLINED;
+        } else {
+            return NGX_AGAIN;
+        }
+    }
+
     if (r->method != NGX_HTTP_POST)
     {
         return NGX_DECLINED;
@@ -320,35 +325,22 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
             ngx_strncmp(value.data, "application/x-www-form-urlencoded",
             sizeof("application/x-www-form-urlencoded")) != 0) {
         dd("not application/x-www-form-urlencoded");
-        //lcf->enabled = 0;
-        /* dd("content-type:%s", r->headers_in.content_type->value.data); */
         return NGX_DECLINED;
     }
 
     dd("content type is application/x-www-form-urlencoded");
-    ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
+
+    dd("create new ctx");
+
+    ctx = ngx_palloc(r->pool, sizeof(ngx_http_form_input_ctx_t));
 
     if (ctx == NULL) {
-        dd("create new ctx");
-        ctx = ngx_palloc(r->pool, sizeof(ngx_http_form_input_ctx_t));
-        if (ctx == NULL) {
-            return NGX_ERROR;
-        }
-        ctx->done = 0;
-        ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
-    } else {
-        if (ctx->done) {
-            return NGX_DECLINED;
-        } else {
-            return NGX_AGAIN;
-        }
-        dd("already have ctx");
-        if (ctx->done) {
-            return NGX_DECLINED;
-        } else {
-            return NGX_AGAIN;
-        }
+        return NGX_ERROR;
     }
+
+    ctx->done = 0;
+    ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
+
     dd("start to read request_body");
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
