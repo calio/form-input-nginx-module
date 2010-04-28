@@ -1,43 +1,41 @@
-#define DDEBUG 0
-#include <ndk.h>
+#define DDEBUG 1
 #include "ddebug.h"
+
+#include <ndk.h>
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
 
 
 typedef struct {
-    ngx_flag_t    flag;
+    ngx_flag_t    enabled;
 } ngx_http_form_input_loc_conf_t;
 
 
 typedef struct {
     ngx_int_t         done;
-    ngx_array_t        *params;
 } ngx_http_form_input_ctx_t;
 
 
-static ngx_int_t
-ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
+static ngx_int_t ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     ngx_http_variable_value_t *v);
 
-static char *
-ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+static char *ngx_http_set_form_input_conf_handler(ngx_conf_t *cf,
+    ngx_command_t *cmd, void *conf);
 
-static void *
-ngx_http_form_input_create_loc_conf(ngx_conf_t *cf);
+static void *ngx_http_form_input_create_loc_conf(ngx_conf_t *cf);
 
-static char *
-ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
+static char *ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent,
+    void *child);
 
-static ngx_int_t
-ngx_http_form_input_init(ngx_conf_t *cf);
+static ngx_int_t ngx_http_form_input_init(ngx_conf_t *cf);
 
-static ngx_int_t
-ngx_http_form_input_handler(ngx_http_request_t *r);
+static ngx_int_t ngx_http_form_input_handler(ngx_http_request_t *r);
 
 static void ngx_http_form_input_post_read(ngx_http_request_t *r);
 
+static ngx_int_t ngx_http_form_input_arg(ngx_http_request_t *r, u_char *name,
+    size_t len, ngx_str_t *value);
 
 static ngx_command_t ngx_http_form_input_commands[] = {
 
@@ -45,7 +43,7 @@ static ngx_command_t ngx_http_form_input_commands[] = {
       NGX_HTTP_LOC_CONF|NGX_CONF_TAKE12,
       ngx_http_set_form_input_conf_handler,
       NGX_HTTP_LOC_CONF_OFFSET,
-      offsetof(ngx_http_form_input_loc_conf_t, flag),
+      offsetof(ngx_http_form_input_loc_conf_t, enabled),
       NULL },
 
       ngx_null_command
@@ -53,32 +51,32 @@ static ngx_command_t ngx_http_form_input_commands[] = {
 
 
 static ngx_http_module_t ngx_http_form_input_module_ctx = {
-    NULL,
-    ngx_http_form_input_init,
+    NULL,                                   /* preconfiguration */
+    ngx_http_form_input_init,               /* postconfiguration */
 
-    NULL,
-    NULL,
+    NULL,                                   /* create main configuration */
+    NULL,                                   /* init main configuration */
 
-    NULL,
-    NULL,
+    NULL,                                   /* create server configuration */
+    NULL,                                   /* merge server configuration */
 
-    ngx_http_form_input_create_loc_conf,
-    ngx_http_form_input_merge_loc_conf
+    ngx_http_form_input_create_loc_conf,    /* create location configuration */
+    ngx_http_form_input_merge_loc_conf      /* merge location configuration */
 };
 
 
 ngx_module_t ngx_http_form_input_module = {
     NGX_MODULE_V1,
-    &ngx_http_form_input_module_ctx,
-    ngx_http_form_input_commands,
-    NGX_HTTP_MODULE,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    &ngx_http_form_input_module_ctx,        /* module context */
+    ngx_http_form_input_commands,           /* module directives */
+    NGX_HTTP_MODULE,                        /* module type */
+    NULL,                                   /* init master */
+    NULL,                                   /* init module */
+    NULL,                                   /* init process */
+    NULL,                                   /* init thread */
+    NULL,                                   /* exit thread */
+    NULL,                                   /* exit precess */
+    NULL,                                   /* exit master */
     NGX_MODULE_V1_PADDING
 };
 
@@ -87,31 +85,13 @@ static ngx_int_t
 ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     ngx_http_variable_value_t *v)
 {
-    ngx_http_form_input_loc_conf_t     *lcf;
-    ngx_http_form_input_ctx_t            *ctx;
-    ngx_chain_t                          *chain;
-    ngx_int_t                            len, n;
-    u_char                               *buf, *p, *last;
-
+    ngx_http_form_input_ctx_t           *ctx;
+    ngx_int_t                            rc;
     dd("ndk handler:set form input handler");
-    /*fprintf(stderr, "content-type:%s\n", r->headers_in.content_type->
-        value.data); */
 
     dd("set default return value");
-    res->data = (u_char *)"";
+    res->data = NULL;
     res->len = 0;
-
-    lcf = ngx_http_get_module_loc_conf(r, ngx_http_form_input_module);
-
-    if(lcf == NULL) {
-        dd("ndk:lcf is null");
-        return NGX_OK;
-    }
-
-    if(lcf->flag == 0 || lcf->flag == NGX_CONF_UNSET) {
-        dd("ndk:flag is 0");
-        return NGX_OK;
-    }
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
@@ -120,53 +100,74 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_OK;
     }
 
-    if (ctx->done != NGX_DONE && ctx->done != NGX_OK) {
+    if (ctx->done != 1) {
         dd("ctx not done");
         return NGX_AGAIN;
     }
 
-    chain = r->request_body->bufs;
+    rc = ngx_http_form_input_arg(r, v->data, v->len, res);
 
-    for (len = 0; chain != NULL; chain = chain->next) {
-        len += (ngx_int_t)(chain->buf->last - chain->buf->start);
+    return rc;
+}
+
+
+static ngx_int_t
+ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
+    ngx_str_t *value)
+{
+    /* fork from ngx_http_arg */
+    u_char              *p;
+    u_char              *last;
+    u_char              *buf;
+    ngx_chain_t         *cl;
+    ngx_int_t            len;
+
+    value->data = NULL;
+    value->len = 0;
+
+    if (r->request_body == NULL) {
+        return NGX_OK;
+    } else if (r->request_body->bufs == NULL) {
+        return NGX_OK;
     }
+
+    len = 0;
+
+    for (cl = r->request_body->bufs; cl != NULL; cl = cl->next) {
+        len += (ngx_int_t)(cl->buf->last - cl->buf->pos);
+    }
+
     dd("len=%d", len);
+
     if (len == 0) {
-        res->len = 0;
-        res->data = (u_char*)"";
         dd("post body len 0");
         return NGX_OK;
     }
 
     buf = ngx_palloc(r->pool, len);
-    p = buf;
-    chain = r->request_body->bufs;
-
-    for (; chain != NULL; chain = chain->next) {
-        n = (ngx_int_t)(chain->buf->last - chain->buf->start);
-        ngx_memcpy(p, chain->buf->start, n);
-        p += n;
+    if (buf == NULL) {
+        return NGX_ERROR;
     }
-
-    /* fork from ngx_http_arg */
     p = buf;
     last = p + len;
 
+    for (cl = r->request_body->bufs; cl != NULL; cl = cl->next) {
+        p = ngx_copy(p, cl->buf->pos, (cl->buf->last - cl->buf->pos));
+    }
+
     dd("buf=%x", (unsigned int)buf);
     dd("last=%x", (unsigned int)last);
-    for ( /* void */; p < last; p++) {
+    for (p = buf; p < last; p++) {
         /* we need '=' after name, so drop one char from last */
 
-        p = ngx_strlcasestrn(p, last - 1, v->data, v->len - 1);
+        p = ngx_strlcasestrn(p, last - 1, arg_name, arg_len - 1);
         dd("%x", (unsigned int)p);
         if (p == NULL) {
-            res->data = (u_char*)"";
-            res->len = 0;
             return NGX_OK;
         }
 
-        if ((p == buf || *(p - 1) == '&') && *(p + v->len) == '=') {
-            res->data = p + v->len + 1;
+        if ((p == buf || *(p - 1) == '&') && *(p + arg_len) == '=') {
+            value->data = p + arg_len + 1;
 
             p = ngx_strlchr(p, last, '&');
 
@@ -174,13 +175,11 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
                 p = last;
             }
 
-            res->len = p - res->data;
+            value->len = p - value->data;
 
             return NGX_OK;
         }
     }
-    res->len = 0;
-    res->data = (u_char*)"";
     return NGX_OK;
 }
 
@@ -189,19 +188,19 @@ static char *
 ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
 {
-    ndk_set_var_t                        filter;
-    ngx_str_t                              *var_name, s;
-    ngx_http_form_input_loc_conf_t         *filcf;
-    u_char                                *p;
+    ndk_set_var_t                            filter;
+    ngx_str_t                               *var_name, s;
+    u_char                                  *p;
+    ngx_http_form_input_loc_conf_t          *flcf = conf;
     dd("set form input conf handler");
 
-    filcf = conf;
-    if (filcf == NULL) {
-        dd("filcf is null");
+    /*if (flcf == NULL) {
+        dd("flcf is null");
         return NGX_CONF_OK;
     }
-    dd("filcf->flag is 1");
-    filcf->flag = 1;
+    dd("flcf->enabled is 1");
+    */
+    flcf->enabled = 1;
 
     filter.type = NDK_SET_VAR_MULTI_VALUE;
     filter.func = ngx_http_set_form_input;
@@ -224,8 +223,7 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
         dd("else ends");
     }
 
-    return ndk_set_var_multi_value_core (cf, var_name,  &s,
-        &filter);
+    return ndk_set_var_multi_value_core (cf, var_name,  &s, &filter);
 }
 
 
@@ -237,10 +235,10 @@ ngx_http_form_input_create_loc_conf(ngx_conf_t *cf)
     conf = ngx_palloc(cf->pool, sizeof(ngx_http_form_input_loc_conf_t));
 
     if (conf == NULL) {
-        return NGX_CONF_ERROR;
+        return NULL;
     }
 
-    conf->flag = NGX_CONF_UNSET;
+    conf->enabled = NGX_CONF_UNSET;
 
     return conf;
 }
@@ -253,7 +251,7 @@ ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     ngx_http_form_input_loc_conf_t *prev = parent;
     ngx_http_form_input_loc_conf_t *conf = child;
 
-    ngx_conf_merge_value(prev->flag, conf->flag, 0);
+    ngx_conf_merge_value(prev->enabled, conf->enabled, 0);
 
     return NGX_CONF_OK;
 }
@@ -265,9 +263,15 @@ ngx_http_form_input_init(ngx_conf_t *cf)
 {
     dd("post conf: form_input_init");
 
-    ngx_http_handler_pt            *h;
-    ngx_http_core_main_conf_t    *cmcf;
-
+    ngx_http_handler_pt             *h;
+    ngx_http_core_main_conf_t       *cmcf;
+    /* ngx_http_form_input_loc_conf_t  *lcf; */
+/*
+    lcf = ngx_http_get_module_loc_conf(cf, ngx_http_form_input);
+    if (lcf->enabled != 1) {
+        return NGX_OK;
+    }
+*/
     cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
 
     h = ngx_array_push(&cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers);
@@ -288,37 +292,36 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     dd("rewrite phase:form_input_handler");
     ngx_http_form_input_loc_conf_t  *lcf;
     ngx_http_form_input_ctx_t       *ctx;
-    ngx_str_t                       value;
-
+    ngx_str_t                        value;
+    ngx_int_t                        rc;
 
     lcf = ngx_http_get_module_loc_conf(r, ngx_http_form_input_module);
-    if (lcf->flag == 0 || lcf->flag == NGX_CONF_UNSET) {
-        dd("rewrite phase:lcf->flag==0");
+
+    if (lcf->enabled == 0 || lcf->enabled == NGX_CONF_UNSET) {
+        dd("rewrite phase:lcf->enabled==0");
         return NGX_DECLINED;
     }
 
     if (r->method != NGX_HTTP_POST)
     {
-        lcf->flag = 0;
         return NGX_DECLINED;
     }
 
-    if(r->headers_in.content_type == NULL || r->headers_in.content_type->
+    if (r->headers_in.content_type == NULL || r->headers_in.content_type->
             value.data == NULL) {
         dd("content_type is %s", r->headers_in.content_type == NULL?"NULL":
                 "NOT NULL");
-        lcf->flag = 0;
         return NGX_DECLINED;
     }
 
     value = r->headers_in.content_type->value;
 
     /* just focus on x-www-form-urlencoded if (r-> */
-    if (value.len < (sizeof("application/x-www-form-urlencoded") - 1) ||
-            ngx_strncmp("application/x-www-form-urlencoded", value.data,
-            value.len) != 0) {
+    if (value.len != (sizeof("application/x-www-form-urlencoded") - 1) ||
+            ngx_strncmp(value.data, "application/x-www-form-urlencoded",
+            sizeof("application/x-www-form-urlencoded")) != 0) {
         dd("not application/x-www-form-urlencoded");
-        lcf->flag = 0;
+        //lcf->enabled = 0;
         /* dd("content-type:%s", r->headers_in.content_type->value.data); */
         return NGX_DECLINED;
     }
@@ -332,13 +335,26 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         if (ctx == NULL) {
             return NGX_ERROR;
         }
-        ctx->done = NGX_BUSY;
+        ctx->done = 0;
         ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
     } else {
         dd("already have ctx");
+        if (ctx->done) {
+            return NGX_DECLINED;
+        } else {
+            return NGX_AGAIN;
+        }
     }
     dd("start to read request_body");
-    ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
+    rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
+
+    if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+        return rc;
+    }
+
+    if (rc == NGX_AGAIN) {
+        return NGX_AGAIN;
+    }
 
     return NGX_DECLINED;
 }
@@ -353,30 +369,10 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     rb = r->request_body;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
-
-    if (ctx == NULL) {
-        dd("post body read:NULL ctx");
-        ctx->done = NGX_DONE;
-        return;
-    } else if (ctx->done == NGX_OK || ctx->done == NGX_DONE) {
-        dd("post body read:finished");
-        return;
-    }
-/*
-    if (rb == NULL) {
-        dd("rb is NULL");
-        ctx->done = NGX_ERROR;
-        return;
-    }
-
-    if (rb->buf == NULL || rb->bufs == NULL) {
-        dd("rb->buf is NULL");
-        ctx->done = NGX_DECLINED;
-        return;
-    }
-*/
     dd("post read done");
-    ctx->done = NGX_DONE;
+    ctx->done = 1;
+    /* reschedule my ndk rewrite phase handler */
+    ngx_http_core_run_phases(r);
 }
 
 
@@ -436,7 +432,7 @@ static ngx_int_t ngx_http_form_input_header_filter(ngx_http_request_t *r)
 
     ngx_http_form_input_ctx_t *ctx;
 
-    if (lcf->flag == 1) {
+    if (lcf->enabled == 1) {
         ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
         if (ctx == NULL) {
             ctx = ngx_palloc(r->pool, sizeof(ngx_http_form_input_ctx_t));

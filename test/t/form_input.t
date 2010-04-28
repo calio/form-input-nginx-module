@@ -258,3 +258,16 @@ bar=foo
 "\n"
 
 
+=== TEST 16
+--- config
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
+--- request
+GET /bar
+bar=I have no content type
+--- response_body eval
+"\n"
+
+
