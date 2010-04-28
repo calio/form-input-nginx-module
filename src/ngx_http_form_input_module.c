@@ -137,7 +137,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
         len += (ngx_int_t)(cl->buf->last - cl->buf->pos);
     }
 
-    dd("len=%d", len);
+    dd("len=%d", (int)len);
 
     if (len == 0) {
         dd("post body len 0");
@@ -155,13 +155,12 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
         p = ngx_copy(p, cl->buf->pos, (cl->buf->last - cl->buf->pos));
     }
 
-    dd("buf=%x", (unsigned int)buf);
-    dd("last=%x", (unsigned int)last);
+    dd("buf=%p", buf);
+    dd("last=%p", last);
     for (p = buf; p < last; p++) {
         /* we need '=' after name, so drop one char from last */
 
         p = ngx_strlcasestrn(p, last - 1, arg_name, arg_len - 1);
-        dd("%x", (unsigned int)p);
         if (p == NULL) {
             return NGX_OK;
         }
@@ -338,6 +337,11 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         ctx->done = 0;
         ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
     } else {
+        if (ctx->done) {
+            return NGX_DECLINED;
+        } else {
+            return NGX_AGAIN;
+        }
         dd("already have ctx");
         if (ctx->done) {
             return NGX_DECLINED;
@@ -346,6 +350,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         }
     }
     dd("start to read request_body");
+
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
 
     if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
@@ -369,8 +374,11 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     rb = r->request_body;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
+
     dd("post read done");
+
     ctx->done = 1;
+
     /* reschedule my ndk rewrite phase handler */
     ngx_http_core_run_phases(r);
 }
