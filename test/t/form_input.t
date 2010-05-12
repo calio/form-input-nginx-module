@@ -28,7 +28,7 @@ POST /bar1
 
 --- response_body eval
 "\n"
-#--- ONLY
+--- ONLY
 
 
 
@@ -45,6 +45,7 @@ POST /bar2
 foo
 --- response_body eval
 "\n"
+--- timeout: 3
 
 
 

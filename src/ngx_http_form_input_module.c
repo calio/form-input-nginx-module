@@ -345,6 +345,8 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
 
+    r->main->count--;
+
     if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
     }
