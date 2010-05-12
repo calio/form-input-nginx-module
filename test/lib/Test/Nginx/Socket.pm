@@ -7,12 +7,14 @@ use Test::Base -Base;
 
 our $VERSION = '0.08';
 
+use Encode;
 use Data::Dumper;
 use Time::HiRes qw(sleep time);
 use Test::LongString;
 use List::MoreUtils qw( any );
 use IO::Select ();
 
+our $ServerAddr = 'localhost';
 our $Timeout = 2;
 
 use Test::Nginx::Util qw(
@@ -55,7 +57,9 @@ our @EXPORT = qw( plan run_tests run_test
     repeat_each config_preamble worker_connections
     master_process_enabled
     no_long_string workers master_on
-    log_level no_shuffle no_root_location);
+    log_level no_shuffle no_root_location
+    server_addr
+);
 
 sub send_request ($$$);
 
@@ -67,6 +71,15 @@ sub write_event_handler ($);
 
 sub no_long_string () {
     $NoLongString = 1;
+}
+
+sub server_addr (@) {
+    if (@_) {
+        #warn "setting server addr to $_[0]\n";
+        $ServerAddr = shift;
+    } else {
+        return $ServerAddr;
+    }
 }
 
 $RunTestHelper = \&run_test_helper;
@@ -299,6 +312,10 @@ $parsed_req->{content}";
             $expected = $block->response_body;
         }
 
+        if ($block->charset) {
+            Encode::from_to($expected, 'UTF-8', $block->charset);
+        }
+
         $expected =~ s/\$ServerPort\b/$ServerPort/g;
         $expected =~ s/\$ServerPortForClient\b/$ServerPortForClient/g;
         #warn show_all_chars($content);
@@ -330,7 +347,7 @@ sub send_request ($$$) {
     my @req_bits = ref $req ? @$req : ($req);
 
     my $sock = IO::Socket::INET->new(
-        PeerAddr => 'localhost',
+        PeerAddr => $ServerAddr,
         PeerPort => $ServerPortForClient,
         Proto    => 'tcp'
     ) or die "Can't connect to localhost:$ServerPortForClient: $!\n";

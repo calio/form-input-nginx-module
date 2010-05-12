@@ -258,6 +258,7 @@ bar=foo
 "\n"
 
 
+
 === TEST 16
 --- config
     location /bar {
