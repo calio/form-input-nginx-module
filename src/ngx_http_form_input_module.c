@@ -345,7 +345,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
 
-    r->main->count--;
+    //if(r->main->count > 1) {
 
     if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
@@ -373,6 +373,8 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 
     ctx->done = 1;
 
+    dd("count--");
+    r->main->count--;
     /* reschedule my ndk rewrite phase handler */
     ngx_http_core_run_phases(r);
 }
