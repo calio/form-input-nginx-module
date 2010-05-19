@@ -272,3 +272,15 @@ bar=I have no content type
 "\n"
 
 
+=== TEST 17
+--- config
+    location /bar {
+        set $bar value;
+        echo $bar;
+    }
+--- request
+GET /bar
+bar=foo
+--- response_body
+value
+
