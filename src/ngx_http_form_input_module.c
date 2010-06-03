@@ -6,6 +6,11 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 
+
+#define form_urlencoded_type "application/x-www-form-urlencoded"
+#define form_urlencoded_type_len (sizeof(form_urlencoded_type) - 1)
+
+
 ngx_flag_t ngx_http_form_input_used = 0;
 
 typedef struct {
@@ -319,10 +324,9 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     value = r->headers_in.content_type->value;
 
     /* just focus on x-www-form-urlencoded */
-    if (value.len != (sizeof("application/x-www-form-urlencoded") - 1) ||
-            ngx_strncmp(value.data, "application/x-www-form-urlencoded",
-            sizeof("application/x-www-form-urlencoded"))
-        != 0)
+    if (value.len < form_urlencoded_type_len ||
+            ngx_strncasecmp(value.data, (u_char *) form_urlencoded_type,
+                form_urlencoded_type_len) != 0)
     {
         dd("not application/x-www-form-urlencoded");
         return NGX_DECLINED;
