@@ -107,6 +107,9 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
 
     rc = ngx_http_form_input_arg(r, v->data, v->len, res);
 
+    if (rc != NGX_ERROR) {
+    }
+
     return rc;
 }
 
@@ -363,6 +366,9 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     ngx_http_form_input_ctx_t     *ctx;
 
     dd("ngx_http_post_read");
+
+    r->read_event_handler = ngx_http_request_empty_handler;
+
     rb = r->request_body;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
@@ -370,10 +376,12 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     dd("post read done");
 
     ctx->done = 1;
+
 #if defined(nginx_version) && nginx_version >= 8011
     dd("count--");
     r->main->count--;
 #endif
+
     /* reschedule my ndk rewrite phase handler */
     ngx_http_core_run_phases(r);
 }
