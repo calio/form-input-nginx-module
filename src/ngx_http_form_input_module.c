@@ -1,4 +1,4 @@
-#define DDEBUG 0
+#define DDEBUG 1
 #include "ddebug.h"
 
 #include <ndk.h>
@@ -85,19 +85,14 @@ static ngx_int_t
 ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     ngx_http_variable_value_t *v)
 {
-    ngx_http_form_input_ctx_t           *ctx;
+    /* ngx_http_form_input_ctx_t           *ctx; */
     ngx_int_t                            rc;
 
     dd_enter();
 
     dd("set default return value");
-    res->data = NULL;
-    res->len = 0;
 
-    if (r->done) {
-        return NGX_OK;
-    }
-
+#if 0
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
     if (ctx == NULL) {
@@ -110,12 +105,22 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_AGAIN;
     }
 
+#endif
+
     rc = ngx_http_form_input_arg(r, v->data, v->len, res);
 
-    if (rc != NGX_ERROR) {
+    if (rc == NGX_ERROR) {
+        return NGX_ERROR;
     }
 
-    return rc;
+    if (rc == NGX_DECLINED) {
+        res->len = 0;
+        res->data = NULL;
+
+        return NGX_OK;
+    }
+
+    return NGX_OK;
 }
 
 
@@ -133,10 +138,18 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     value->data = NULL;
     value->len = 0;
 
+    if (r->request_body == NULL && r != r->main) {
+        r->request_body = r->main->request_body;
+    }
+
     if (r->request_body == NULL) {
-        return NGX_OK;
-    } else if (r->request_body->bufs == NULL) {
-        return NGX_OK;
+        dd("request body NULL");
+        return NGX_DECLINED;
+
+    }
+
+    if (r->request_body->bufs == NULL) {
+        return NGX_DECLINED;
     }
 
     len = 0;
@@ -145,11 +158,13 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
         len += (ngx_int_t)(cl->buf->last - cl->buf->pos);
     }
 
+    dd("arg name: %.*s", (int) arg_len, arg_name);
+
     dd("len=%d", (int)len);
 
     if (len == 0) {
         dd("post body len 0");
-        return NGX_OK;
+        return NGX_DECLINED;
     }
 
     buf = ngx_palloc(r->pool, len);
@@ -160,7 +175,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     p = buf;
     last = p + len;
 
-    for (cl = r->request_body->bufs; cl != NULL; cl = cl->next) {
+    for (cl = r->request_body->bufs; cl; cl = cl->next) {
         p = ngx_copy(p, cl->buf->pos, (cl->buf->last - cl->buf->pos));
     }
 
@@ -171,7 +186,9 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
 
         p = ngx_strlcasestrn(p, last - 1, arg_name, arg_len - 1);
         if (p == NULL) {
-            return NGX_OK;
+            dd("arg name not found");
+
+            return NGX_DECLINED;
         }
 
         if ((p == buf || *(p - 1) == '&') && *(p + arg_len) == '=') {
@@ -185,10 +202,13 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
 
             value->len = p - value->data;
 
+            dd("value len: %d", (int) value->len);
+
             return NGX_OK;
         }
     }
-    return NGX_OK;
+
+    return NGX_DECLINED;
 }
 
 
