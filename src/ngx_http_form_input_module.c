@@ -85,7 +85,7 @@ static ngx_int_t
 ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     ngx_http_variable_value_t *v)
 {
-    /* ngx_http_form_input_ctx_t           *ctx; */
+    ngx_http_form_input_ctx_t           *ctx;
     ngx_int_t                            rc;
 
     dd_enter();
@@ -98,7 +98,6 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_OK;
     }
 
-#if 0
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
     if (ctx == NULL) {
@@ -110,11 +109,8 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
         dd("ctx not done");
         return NGX_AGAIN;
     }
-#endif
 
     rc = ngx_http_form_input_arg(r, v->data, v->len, res);
-
-    dd("form input arg: %d", (int) rc);
 
     if (rc != NGX_ERROR) {
     }
@@ -138,16 +134,8 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     value->len = 0;
 
     if (r->request_body == NULL) {
-        r->request_body = r->main->request_body;
-    }
-
-    if (r->request_body == NULL) {
-        dd("request body is NULL");
-
         return NGX_OK;
     } else if (r->request_body->bufs == NULL) {
-        dd("request body bufs is NULL");
-
         return NGX_OK;
     }
 
@@ -315,9 +303,6 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 */
-
-    r = r->main;
-
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
     if (ctx != NULL) {
@@ -327,21 +312,19 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         return NGX_AGAIN;
     }
 
-    if (r->main->method != NGX_HTTP_POST)
+    if (r->method != NGX_HTTP_POST)
     {
         return NGX_DECLINED;
     }
 
-    if (r->main->headers_in.content_type == NULL
-            || r->main->headers_in.content_type-> value.data == NULL)
-    {
-        dd("content_type is %s", r->main->headers_in.content_type == NULL?"NULL":
+    if (r->headers_in.content_type == NULL || r->headers_in.content_type->
+            value.data == NULL) {
+        dd("content_type is %s", r->headers_in.content_type == NULL?"NULL":
                 "NOT NULL");
-
         return NGX_DECLINED;
     }
 
-    value = r->main->headers_in.content_type->value;
+    value = r->headers_in.content_type->value;
 
     /* just focus on x-www-form-urlencoded */
     if (value.len < form_urlencoded_type_len ||
