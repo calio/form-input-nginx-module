@@ -30,6 +30,7 @@ POST /bar1
 "\n"
 
 
+
 === TEST 2:
 --- config
     location /bar2 {
@@ -269,6 +270,7 @@ GET /bar
 bar=I have no content type
 --- response_body eval
 "\n"
+
 
 
 === TEST 17
