@@ -17,10 +17,10 @@ __DATA__
 
 === TEST 1: blank body
 --- config
-	location /bar1 {
-		set_form_input $foo bar;
-		echo $foo;
-	}
+    location /bar1 {
+        set_form_input $foo bar;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -32,10 +32,10 @@ POST /bar1
 
 === TEST 2:
 --- config
-	location /bar2 {
-		set_form_input $foo bar;
-		echo $foo;
-	}
+    location /bar2 {
+        set_form_input $foo bar;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -49,10 +49,10 @@ foo
 
 === TEST 3:
 --- config
-	location /bar3 {
-		set_form_input $foo bar3;
-		echo $foo;
-	}
+    location /bar3 {
+        set_form_input $foo bar3;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -65,10 +65,10 @@ foo=
 
 === TEST 4:
 --- config
-	location /bar4 {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar4 {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -81,10 +81,10 @@ bar
 
 === TEST 5:
 --- config
-	location /bar5 {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar5 {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -97,10 +97,10 @@ POST /bar5
 
 === TEST 6:
 --- config
-	location /bar6 {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar6 {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -113,10 +113,10 @@ foo&
 
 === TEST 7:
 --- config
-	location /bar {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -129,10 +129,10 @@ foo=&
 
 === TEST 8:
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -145,10 +145,10 @@ POST /bar
 
 === TEST 9:
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -161,10 +161,10 @@ POST /bar
 
 === TEST 10:
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -177,10 +177,10 @@ POST /bar
 
 === TEST 11:
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -193,10 +193,10 @@ foo
 
 === TEST 12:
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -209,12 +209,12 @@ POST /bar
 
 === TEST 13:
 --- config
-	location /bar {
-		set_form_input $bar1 foo1;
-		set_form_input $bar2 foo2;
-		echo $bar1;
-		echo $bar2;
-	}
+    location /bar {
+        set_form_input $bar1 foo1;
+        set_form_input $bar2 foo2;
+        echo $bar1;
+        echo $bar2;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -228,10 +228,10 @@ bar2
 
 === TEST 14:
 --- config
-	location /bar {
-		set_form_input $bar username;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar username;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -244,10 +244,10 @@ foo=bar
 
 === TEST 15
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
