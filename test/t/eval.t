@@ -1,4 +1,4 @@
-# vi:filetype=
+# vi:filetype=perl
 
 use lib 'lib';
 use Test::Nginx::Socket;
@@ -15,24 +15,22 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: eval + form_input
+=== TEST 1: blank body
 --- config
-    location /bar {
-        set_form_input $dummy;
+    location /bar1 {
         eval_subrequest_in_memory off;
         eval_override_content_type text/plain;
-        eval_buffer_size 1k;
         eval $res {
             default_type text/plain;
             set_form_input $foo bar;
-            echo 'hi'; #$foo;
+            echo $foo;
         }
         echo [$res];
     }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
-POST /bar
+POST /bar1
 bar=3
 --- response_body
 [3]
