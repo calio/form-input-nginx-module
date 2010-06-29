@@ -1,7 +1,7 @@
 # vi:filetype=perl
 
 use lib 'lib';
-use Test::Nginx::Socket;
+use Test::Nginx::Socket skip_all => 'not working at all';
 
 #repeat_each(3);
 
