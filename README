@@ -86,7 +86,12 @@ Copyright & License
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Changelog
-    Changes with form-input-module v0.0.2 *) support set_fomr_input_multi *)
-    support PUT method Changes with form-input-module v0.0.1 *) support
-    set_form_input
+    Changes with form-input-module v0.0.2
+
+      *) support set_fomr_input_multi
+      *) support PUT method
+
+    Changes with form-input-module v0.0.1
+
+      *) support set_form_input
 
