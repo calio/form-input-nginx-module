@@ -2,26 +2,43 @@
 
 # this file is mostly meant to be used by the author himself.
 
+rm ~/work/nginx-0.8.41/objs/addon/ndk/ndk.o ~/work/nginx-0.8.41/objs/addon/ndk-nginx-module/ndk.o
+
 root=`pwd`
+home=~
 cd ~/work
 version=$1
-home=~
 opts=$2
-lwp-mirror "http://sysoev.ru/nginx/nginx-$version.tar.gz" nginx-$version.tar.gz
-tar -xzvf nginx-$version.tar.gz
+if [ ! -s "nginx-$version.tar.gz" ]; then
+    wget "http://sysoev.ru/nginx/nginx-$version.tar.gz" -O nginx-$version.tar.gz
+    if [ "$?" != 0 ]; then
+        echo Abort.
+        exit 1;
+    fi
+    tar -xzvf nginx-$version.tar.gz
+    if [ "$?" != 0 ]; then
+        echo Abort.
+        exit 1;
+    fi
+    if [ "$version" = "0.8.41" ]; then
+        cp $root/../no-pool-nginx/nginx-0.8.41-no_pool.patch ./
+        patch -p0 < nginx-0.8.41-no_pool.patch
+        if [ "$?" != 0 ]; then
+            echo Abort.
+            exit 1
+        fi
+    fi
+fi
 cd nginx-$version/
-if [[ "$BUILD_CLEAN" -eq 1 || ! -f Makefile || "$root/config" -nt Makefile || "$root/util/build.sh" -nt Makefile ]]; then
+if [[ "$BUILD_CLEAN" = 1 || ! -f Makefile || "$root/config" -nt Makefile || "$root/util/build.sh" -nt Makefile ]]; then
     ./configure --prefix=/opt/nginx \
+          --with-cc-opt="-O0" \
           --add-module=$root/../echo-nginx-module \
           --add-module=$root/../ndk-nginx-module \
-          --add-module=$root/../eval-nginx-module \
           --add-module=$root/../array-var-nginx-module \
           --add-module=$root $opts \
           --with-debug
-          #--add-module=$home/work/ngx_http_auth_request-0.1 #\
-          #--with-rtsig_module
-          #--with-cc-opt="-g3 -O0"
-          #--add-module=$root/../echo-nginx-module \
+          #--add-module=$home/work/ndk \
   #--without-http_ssi_module  # we cannot disable ssi because echo_location_async depends on it (i dunno why?!)
 
 fi

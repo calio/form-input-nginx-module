@@ -21,16 +21,3 @@
    epoll_ctl(event)
    fun:epoll_ctl
 }
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Param
-   epoll_ctl(event)
-   fun:epoll_ctl
-   fun:ngx_handle_read_event
-   fun:ngx_http_init_connection
-   fun:ngx_event_accept
-   fun:ngx_epoll_process_events
-   fun:ngx_process_events_and_timers
-   fun:ngx_single_process_cycle
-   fun:main
-}

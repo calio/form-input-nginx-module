@@ -19,8 +19,8 @@ typedef struct {
 
 
 typedef struct {
-    ngx_int_t           done;
-    ngx_flag_t          waiting_request_body;
+    ngx_flag_t          done;
+    ngx_flag_t          waiting_more_body;
 } ngx_http_form_input_ctx_t;
 
 
@@ -412,20 +412,20 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     /* ngx_pcalloc
      * ctx->done = 0;
+     * ctx->waiting_more_body = 0;
      */
     ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_form_input_ctx_t));
 
     if (ctx == NULL) {
         return NGX_ERROR;
     }
-    ctx->waiting_request_body = 1;
 
     ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
 
     dd("start to read request_body");
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
-    ctx->waiting_request_body = 0;
+    ctx->waiting_more_body = 1;
     if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
     }
@@ -460,9 +460,10 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     r->main->count--;
 #endif
 
-    /* waiting_request_body my rewrite phase handler */
-    if (!ctx->waiting_request_body) {
+    /* waiting_more_body my rewrite phase handler */
+    if (ctx->waiting_more_body) {
        ngx_http_core_run_phases(r);
+       ctx->waiting_more_body = 0;
     }
 }
 

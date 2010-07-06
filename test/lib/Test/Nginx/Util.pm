@@ -405,7 +405,7 @@ sub run_test ($) {
                 if (kill(SIGQUIT, $pid) == 0) { # send quit signal
                     #warn("$name - Failed to send quit signal to the nginx process with PID $pid");
                 }
-                sleep 0.02;
+                sleep 0.5;
                 if (system("ps $pid > /dev/null") == 0) {
                     #warn "killing with force...\n";
                     kill(SIGKILL, $pid);
@@ -482,7 +482,7 @@ start_nginx:
                 }
             }
 
-            sleep 0.1;
+            sleep 0.5;
         }
     }
 
@@ -522,7 +522,7 @@ start_nginx:
                 if (kill(SIGQUIT, $pid) == 0) { # send quit signal
                     warn("$name - Failed to send quit signal to the nginx process with PID $pid");
                 }
-                sleep 0.1;
+                sleep 1;
                 if (-f $PidFile) {
                     #warn "killing with force (valgrind or profile)...\n";
                     kill(SIGKILL, $pid);
