@@ -111,3 +111,20 @@ some=some&name=calio&any=any
 --- response_body
 calio
 
+
+=== TEST 7: inplace
+--- config
+    location /foo {
+        set_form_input_multi $name;
+        array_join ' ' $name;
+        echo $name;
+    }
+--- more_headers
+Content-type: application/x-www-form-urlencoded
+--- request
+POST /foo
+name=calio&name=agentzh
+--- response_body
+calio agentzh
+
+
