@@ -462,8 +462,8 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 
     /* waiting_more_body my rewrite phase handler */
     if (ctx->waiting_more_body) {
-       ngx_http_core_run_phases(r);
        ctx->waiting_more_body = 0;
+       ngx_http_core_run_phases(r);
     }
 }
 
