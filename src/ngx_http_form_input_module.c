@@ -426,13 +426,12 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
 
-    ctx->waiting_more_body = 1;
-
     if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
     }
 
     if (rc == NGX_AGAIN) {
+        ctx->waiting_more_body = 1;
         return NGX_AGAIN;
     }
 
@@ -442,14 +441,11 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
 static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 {
-    ngx_http_request_body_t        *rb;
     ngx_http_form_input_ctx_t     *ctx;
 
     dd("ngx_http_post_read");
 
     r->read_event_handler = ngx_http_request_empty_handler;
-
-    rb = r->request_body;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
@@ -464,8 +460,8 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 
     /* waiting_more_body my rewrite phase handler */
     if (ctx->waiting_more_body) {
-       ctx->waiting_more_body = 0;
-       ngx_http_core_run_phases(r);
+        ctx->waiting_more_body = 0;
+        ngx_http_core_run_phases(r);
     }
 }
 
