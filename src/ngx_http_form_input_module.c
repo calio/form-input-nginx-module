@@ -19,8 +19,8 @@ typedef struct {
 
 
 typedef struct {
-    ngx_flag_t          done;
-    ngx_flag_t          waiting_more_body;
+    ngx_flag_t          done:1;
+    ngx_flag_t          waiting_more_body:1;
 } ngx_http_form_input_ctx_t;
 
 
@@ -113,7 +113,7 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_OK;
     }
 
-    if (ctx->done != 1) {
+    if (! ctx->done) {
         dd("ctx not done");
         return NGX_AGAIN;
     }
@@ -146,7 +146,7 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_OK;
     }
 
-    if (ctx->done != 1) {
+    if (! ctx->done) {
         dd("ctx not done");
         return NGX_AGAIN;
     }
@@ -425,7 +425,9 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     dd("start to read request_body");
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
+
     ctx->waiting_more_body = 1;
+
     if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
     }
