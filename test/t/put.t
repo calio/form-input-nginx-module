@@ -13,7 +13,6 @@ run_tests();
 
 __DATA__
 
-
 === TEST 1: basic
 --- config
     location /foo {
@@ -27,6 +26,8 @@ POST /foo
 name=calio
 --- response_body
 calio
+
+
 
 === TEST 2: basic
 --- config

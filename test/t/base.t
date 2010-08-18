@@ -30,6 +30,7 @@ POST /bar1
 "\n"
 
 
+
 === TEST 2:
 --- config
 	location /bar2 {

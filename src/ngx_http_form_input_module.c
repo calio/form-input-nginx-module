@@ -198,7 +198,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
         len += (ngx_int_t)(cl->buf->last - cl->buf->pos);
     }
 
-    dd("len=%d", len);
+    dd("len=%d", (int) len);
 
     if (len == 0) {
         return NGX_OK;
@@ -240,7 +240,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
                 }
                 s->data = v;
                 s->len = p - v;
-                dd("array var:%.*s", s->len, s->data);
+                dd("array var:%.*s", (int) s->len, s->data);
             } else {
                 value->data = v;
                 value->len = p - v;
@@ -396,7 +396,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     value = r->headers_in.content_type->value;
 
-    dd("r->headers_in.content_length_n:%lld", r->headers_in.content_length_n);
+    dd("r->headers_in.content_length_n:%d", (int) r->headers_in.content_length_n);
     /* just focus on x-www-form-urlencoded */
     if (value.len < form_urlencoded_type_len ||
             ngx_strncasecmp(value.data, (u_char *) form_urlencoded_type,

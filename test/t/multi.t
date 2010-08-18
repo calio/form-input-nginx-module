@@ -29,6 +29,7 @@ name=calio&somethins&name=agentzh
 calio agentzh
 
 
+
 === TEST 2: combined
 --- config
     location /foo {
@@ -48,6 +49,7 @@ calio
 calio agentzh guoying nobody somebody
 
 
+
 === TEST 3: blank body
 --- config
     location /foo {
@@ -61,6 +63,7 @@ Content-Type: application/x-www-form-urlencoded
 POST /foo
 --- response_body eval
 "\n"
+
 
 
 === TEST 4: not fit
@@ -77,6 +80,7 @@ POST /foo
 a=b&c=d&e=f&g=h&i=j&k=l
 --- response_body eval
 "\n"
+
 
 
 === TEST 5: not fit 2
@@ -110,6 +114,7 @@ POST /foo
 some=some&name=calio&any=any
 --- response_body
 calio
+
 
 
 === TEST 7: inplace
