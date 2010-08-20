@@ -6,9 +6,11 @@ rm ~/work/nginx-0.8.41/objs/addon/ndk/ndk.o ~/work/nginx-0.8.41/objs/addon/ndk-n
 
 root=`pwd`
 home=~
+
 cd ~/work
 version=$1
 opts=$2
+
 if [ ! -s "nginx-$version.tar.gz" ]; then
     wget "http://sysoev.ru/nginx/nginx-$version.tar.gz" -O nginx-$version.tar.gz
     if [ "$?" != 0 ]; then
