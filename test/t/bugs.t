@@ -49,7 +49,7 @@ bar=32
 === TEST 3: Internal server error when using array_map_op [calio/form-input-nginx-module GH-1]
 http://github.com/calio/form-input-nginx-module/issues#issue/1
 --- config
-   location ~ ^/(?<table>\w+)/(?<id>\d+)/?$ {
+   location ~ ^/(\w+)/(\d+)/?$ {
        set_form_input    $columns;
        set_form_input    $values;
        array_split       ',' $values to=$array;
