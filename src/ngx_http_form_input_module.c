@@ -168,7 +168,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
 {
     u_char              *p, *v, *last, *buf;
     ngx_chain_t         *cl;
-    ngx_int_t            len = 0;
+    size_t               len = 0;
     ngx_array_t         *array = NULL;
     ngx_str_t           *s;
 
@@ -195,7 +195,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
 
     len = 0;
     for (cl = r->request_body->bufs; cl != NULL; cl = cl->next) {
-        len += (ngx_int_t)(cl->buf->last - cl->buf->pos);
+        len += cl->buf->last - cl->buf->pos;
     }
 
     dd("len=%d", (int) len);
@@ -212,9 +212,13 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     p = buf;
     last = p + len;
 
-    for (cl = r->request_body->bufs; cl != NULL; cl = cl->next) {
-        p = ngx_copy(p, cl->buf->pos, (cl->buf->last - cl->buf->pos));
+    for (cl = r->request_body->bufs; cl; cl = cl->next) {
+        p = ngx_copy(p, cl->buf->pos, cl->buf->last - cl->buf->pos);
     }
+
+    dd("p - buf = %d, last - buf = %d", (int) (p - buf), (int) (last - buf));
+
+    dd("copied buf (len %d): %.*s", (int) len, (int) len, buf);
 
     for (p = buf; p < last; p++) {
         /* we need '=' after name, so drop one char from last */
@@ -224,13 +228,20 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             return NGX_OK;
         }
 
+        dd("found argument name, offset: %d", (int) (p - buf));
+
         if ((p == buf || *(p - 1) == '&') && *(p + arg_len) == '=') {
             v = p + arg_len + 1;
+            dd("v = %d...", (int) (v - buf));
 
-            p = ngx_strlchr(p, last, '&');
-
+            dd("buf now (len %d): %.*s",
+                    (int) (last - v), (int) (last - v), v);
+            p = ngx_strlchr(v, last, '&');
             if (p == NULL) {
+                dd("& not found, pointing it to last...");
                 p = last;
+            } else {
+                dd("found &, pointing it to %d...", (int) (p - buf));
             }
 
             if (multi) {
@@ -244,6 +255,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             } else {
                 value->data = v;
                 value->len = p - v;
+                dd("value: [%.*s]", (int) value->len, value->data);
                 return NGX_OK;
             }
         }
