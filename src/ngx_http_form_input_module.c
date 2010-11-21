@@ -13,10 +13,13 @@
 
 ngx_flag_t ngx_http_form_input_used = 0;
 
+#if 0
+
 typedef struct {
     ngx_flag_t    enabled;
 } ngx_http_form_input_loc_conf_t;
 
+#endif
 
 typedef struct {
     ngx_flag_t          done:1;
@@ -28,9 +31,15 @@ static ngx_int_t ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     ngx_http_variable_value_t *v);
 static char *ngx_http_set_form_input_conf_handler(ngx_conf_t *cf,
     ngx_command_t *cmd, void *conf);
+
+#if 0
+
 static void *ngx_http_form_input_create_loc_conf(ngx_conf_t *cf);
 static char *ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent,
     void *child);
+
+#endif
+
 static ngx_int_t ngx_http_form_input_init(ngx_conf_t *cf);
 static ngx_int_t ngx_http_form_input_handler(ngx_http_request_t *r);
 static void ngx_http_form_input_post_read(ngx_http_request_t *r);
@@ -68,8 +77,8 @@ static ngx_http_module_t ngx_http_form_input_module_ctx = {
     NULL,                                   /* create server configuration */
     NULL,                                   /* merge server configuration */
 
-    ngx_http_form_input_create_loc_conf,    /* create location configuration */
-    ngx_http_form_input_merge_loc_conf      /* merge location configuration */
+    NULL,                                   /* create location configuration */
+    NULL                                   /* merge location configuration */
 };
 
 
@@ -103,6 +112,7 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     res->len = 0;
 
     if (r->done) {
+        dd("request done");
         return NGX_OK;
     }
 
@@ -171,6 +181,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     size_t               len = 0;
     ngx_array_t         *array = NULL;
     ngx_str_t           *s;
+    ngx_buf_t           *b;
 
     if (multi) {
         array = ngx_array_create(r->pool, 1, sizeof(ngx_str_t));
@@ -185,40 +196,62 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     }
 
     /* we read data from r->request_body->bufs */
-    if (r->request_body == NULL) {
+    if (r->request_body == NULL || r->request_body->bufs == NULL) {
+        dd("empty rb or empty rb bufs");
         return NGX_OK;
     }
 
-    if (r->request_body->bufs == NULL) {
-        return NGX_OK;
+    if (r->request_body->bufs->next != NULL) {
+        /* more than one buffer...we should copy the data out... */
+        len = 0;
+        for (cl = r->request_body->bufs; cl; cl = cl->next) {
+            b = cl->buf;
+
+            if (b->in_file) {
+                ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                        "form-input: in-file buffer found. aborted. "
+                        "consider increasing your client_body_buffer_size "
+                        "setting");
+
+                return NGX_OK;
+            }
+
+            len += b->last - b->pos;
+        }
+
+        dd("len=%d", (int) len);
+
+        if (len == 0) {
+            return NGX_OK;
+        }
+
+        buf = ngx_palloc(r->pool, len);
+        if (buf == NULL) {
+            return NGX_ERROR;
+        }
+
+        p = buf;
+        last = p + len;
+
+        for (cl = r->request_body->bufs; cl; cl = cl->next) {
+            p = ngx_copy(p, cl->buf->pos, cl->buf->last - cl->buf->pos);
+        }
+
+        dd("p - buf = %d, last - buf = %d", (int) (p - buf), (int) (last - buf));
+
+        dd("copied buf (len %d): %.*s", (int) len, (int) len, buf);
+
+    } else {
+        dd("XXX one buffer only");
+
+        b = r->request_body->bufs->buf;
+        if (ngx_buf_size(b) == 0) {
+            return NGX_OK;
+        }
+
+        buf = b->pos;
+        last = b->last;
     }
-
-    len = 0;
-    for (cl = r->request_body->bufs; cl != NULL; cl = cl->next) {
-        len += cl->buf->last - cl->buf->pos;
-    }
-
-    dd("len=%d", (int) len);
-
-    if (len == 0) {
-        return NGX_OK;
-    }
-
-    buf = ngx_palloc(r->pool, len);
-    if (buf == NULL) {
-        return NGX_ERROR;
-    }
-
-    p = buf;
-    last = p + len;
-
-    for (cl = r->request_body->bufs; cl; cl = cl->next) {
-        p = ngx_copy(p, cl->buf->pos, cl->buf->last - cl->buf->pos);
-    }
-
-    dd("p - buf = %d, last - buf = %d", (int) (p - buf), (int) (last - buf));
-
-    dd("copied buf (len %d): %.*s", (int) len, (int) len, buf);
 
     for (p = buf; p < last; p++) {
         /* we need '=' after name, so drop one char from last */
@@ -310,6 +343,8 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
 }
 
 
+#if 0
+
 static void *
 ngx_http_form_input_create_loc_conf(ngx_conf_t *cf)
 {
@@ -330,6 +365,8 @@ ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
     return NGX_CONF_OK;
 }
+
+#endif
 
 
 /* register a new rewrite phase handler */
@@ -461,14 +498,14 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
-    dd("post read done");
-
     ctx->done = 1;
 
 #if defined(nginx_version) && nginx_version >= 8011
     dd("count--");
     r->main->count--;
 #endif
+
+    dd("waiting more body: %d", (int) ctx->waiting_more_body);
 
     /* waiting_more_body my rewrite phase handler */
     if (ctx->waiting_more_body) {

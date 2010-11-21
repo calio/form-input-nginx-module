@@ -33,14 +33,11 @@ if [ ! -s "nginx-$version.tar.gz" ]; then
 fi
 
 #tar -xzvf nginx-$version.tar.gz || exit 1
-#cp $root/../no-pool-nginx/nginx-0.8.41-no_pool.patch ./
-#patch -p0 < nginx-0.8.41-no_pool.patch
+#cp $root/../no-pool-nginx/nginx-$version-no_pool.patch ./
+#patch -p0 < nginx-$version-no_pool.patch
+#patch -p0 < ~/work/nginx-$version-rewrite_phase_fix.patch || exit 1
 
-if [ -n "$2" ]; then
-    cd nginx-$version-$2/
-else
-    cd nginx-$version/
-fi
+cd nginx-$version/
 
 if [[ "$BUILD_CLEAN" = 1 || ! -f Makefile || "$root/config" -nt Makefile || "$root/util/build.sh" -nt Makefile ]]; then
     ./configure --prefix=/opt/nginx \

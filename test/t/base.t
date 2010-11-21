@@ -225,7 +225,7 @@ foo1=bar1&foo2=bar2
 --- response_body
 bar1
 bar2
---- timeout: 4
+--- timeout: 2
 
 
 
