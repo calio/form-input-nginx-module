@@ -125,7 +125,7 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
 
     if (! ctx->done) {
         dd("ctx not done");
-        return NGX_AGAIN;
+        return NGX_OK;
     }
 
     rc = ngx_http_form_input_arg(r, v->data, v->len, res, 0);
@@ -158,7 +158,7 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
 
     if (! ctx->done) {
         dd("ctx not done");
-        return NGX_AGAIN;
+        return NGX_OK;
     }
 
     rc = ngx_http_form_input_arg(r, v->data, v->len, res, 1);
@@ -428,7 +428,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         if (ctx->done) {
             return NGX_DECLINED;
         }
-        return NGX_AGAIN;
+        return NGX_DONE;
     }
 
     if (r->method != NGX_HTTP_POST && r->method != NGX_HTTP_PUT)
@@ -481,7 +481,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     if (rc == NGX_AGAIN) {
         ctx->waiting_more_body = 1;
-        return NGX_AGAIN;
+        return NGX_DONE;
     }
 
     return NGX_DECLINED;
