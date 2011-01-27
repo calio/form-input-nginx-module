@@ -68,10 +68,12 @@ Limitations
 Compatibility
     The following versions of Nginx should work with this module:
 
+    *   0.9.x (last tested: 0.9.4)
+
     *   0.8.0 ~ 0.8.41, 0.8.54+ (0.8.42 ~ 0.8.53 requires a patch, see below,
                                  last tested: 0.8.54)
 
-    *   0.7.x (last tested version is 0.7.67)
+    *   0.7.x (last tested: 0.7.68)
 
 Note that nginx 0.8.42 ~ 0.8.53 won't work due to a famous regression appeared
 since 0.8.42: <http://forum.nginx.org/read.php?29,103078,103078 >,
@@ -82,12 +84,12 @@ but a small patch can fix this issue for nginx 0.8.53:
 This patch may also be applied cleanly for other versions of nginx 0.8.42 ~ 0.8.53 :)
 
 Copyright & License
-    Copyright (c) 2010, Taobao Inc., Alibaba Group ( http://www.taobao.com
+    Copyright (c) 2010, 2011, Taobao Inc., Alibaba Group ( http://www.taobao.com
     ).
 
-    Copyright (c) 2010, calio <vipcalio@gmail.com>.
+    Copyright (c) 2010, 2011, Jiale "calio" Zhi <vipcalio@gmail.com>.
 
-    Copyright (c) 2010, Yichun Zhang (agentzh) <agentzh@gmail.com>.
+    Copyright (c) 2010, 2011, Yichun "agentzh" Zhang <agentzh@gmail.com>.
 
     This module is licensed under the terms of the BSD license.
 
