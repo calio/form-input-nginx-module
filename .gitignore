@@ -62,3 +62,4 @@ src/handler.c
 src/handler.h
 util/bench
 pack
+all.sh
