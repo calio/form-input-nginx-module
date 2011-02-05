@@ -2,6 +2,7 @@
 #include "ddebug.h"
 
 #include <ndk.h>
+#include <nginx.h>
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
@@ -310,6 +311,10 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
     ndk_set_var_t                            filter;
     ngx_str_t                               *value, s;
     u_char                                  *p;
+
+#if defined(nginx_version) && nginx_version >= 8042 && nginx_version <= 8053
+    return "does not work with " NGINX_VER;
+#endif
 
     ngx_http_form_input_used = 1;
 
