@@ -432,7 +432,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     if (ctx != NULL) {
         if (ctx->done) {
             ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http form_input rewrite phase handler done")
+                           "http form_input rewrite phase handler done");
 
             return NGX_DECLINED;
         }
