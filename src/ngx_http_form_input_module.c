@@ -425,30 +425,14 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     dd_enter();
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http form_input rewrite phase handler, "
-#if defined(nginx_version) && nginx_version >= 8011
-                   "c:%d"
-#endif
-                   "a:%d",
-#if defined(nginx_version) && nginx_version >= 8011
-                   r->main->count,
-#endif
-                   r == r->connection->data);
+                   "http form_input rewrite phase handler");
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
     if (ctx != NULL) {
         if (ctx->done) {
             ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http form_input rewrite phase handler done, "
-#if defined(nginx_version) && nginx_version >= 8011
-                           "c:%d"
-#endif
-                           "a:%d",
-#if defined(nginx_version) && nginx_version >= 8011
-                           r->main->count,
-#endif
-                           r == r->connection->data);
+                           "http form_input rewrite phase handler done")
 
             return NGX_DECLINED;
         }
@@ -499,15 +483,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http form_input start to read client request body, "
-#if defined(nginx_version) && nginx_version >= 8011
-                   "c:%d"
-#endif
-                   "a:%d",
-#if defined(nginx_version) && nginx_version >= 8011
-                   r->main->count,
-#endif
-                   r == r->connection->data);
+                   "http form_input start to read client request body");
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
 
@@ -533,15 +509,7 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     ngx_http_form_input_ctx_t     *ctx;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http form_input post read request body"
-#if defined(nginx_version) && nginx_version >= 8011
-                   "c:%d"
-#endif
-                   "a:%d",
-#if defined(nginx_version) && nginx_version >= 8011
-                   r->main->count,
-#endif
-                   r == r->connection->data);
+                   "http form_input post read request body");
 
     r->read_event_handler = ngx_http_request_empty_handler;
 
