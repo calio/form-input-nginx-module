@@ -274,6 +274,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             if (p == NULL) {
                 dd("& not found, pointing it to last...");
                 p = last;
+
             } else {
                 dd("found &, pointing it to %d...", (int) (p - buf));
             }
@@ -328,17 +329,20 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
     {
         dd("use ngx_http_form_input_multi");
         filter.func = ngx_http_set_form_input_multi;
+
     } else {
         filter.func = ngx_http_set_form_input;
     }
 
     value++;
+
     if (cf->args->nelts == 2)
     {
         p = value->data;
         p++;
         s.len = value->len - 1;
         s.data = p;
+
     } else if (cf->args->nelts == 3) {
         s.len = (value + 1)->len;
         s.data = (value + 1)->data;
@@ -419,20 +423,36 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     ngx_int_t                        rc;
 
     dd_enter();
-/*
-    lcf = ngx_http_get_module_loc_conf(r, ngx_http_form_input_module);
 
-    if (lcf->enabled == 0) {
-        dd("rewrite phase:lcf->enabled==0");
-        return NGX_DECLINED;
-    }
-*/
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "http form_input rewrite phase handler, "
+#if defined(nginx_version) && nginx_version >= 8011
+                   "c:%d"
+#endif
+                   "a:%d",
+#if defined(nginx_version) && nginx_version >= 8011
+                   r->main->count,
+#endif
+                   r == r->connection->data);
+
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
     if (ctx != NULL) {
         if (ctx->done) {
+            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "http form_input rewrite phase handler done, "
+#if defined(nginx_version) && nginx_version >= 8011
+                           "c:%d"
+#endif
+                           "a:%d",
+#if defined(nginx_version) && nginx_version >= 8011
+                           r->main->count,
+#endif
+                           r == r->connection->data);
+
             return NGX_DECLINED;
         }
+
         return NGX_DONE;
     }
 
@@ -441,10 +461,12 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    if (r->headers_in.content_type == NULL || r->headers_in.content_type->
-            value.data == NULL) {
+    if (r->headers_in.content_type == NULL ||
+            r->headers_in.content_type->value.data == NULL)
+    {
         dd("content_type is %s", r->headers_in.content_type == NULL?"NULL":
                 "NOT NULL");
+
         return NGX_DECLINED;
     }
 
@@ -464,19 +486,28 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     dd("create new ctx");
 
-    /* ngx_pcalloc
-     * ctx->done = 0;
-     * ctx->waiting_more_body = 0;
-     */
     ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_form_input_ctx_t));
-
     if (ctx == NULL) {
         return NGX_ERROR;
     }
 
+    /* set by ngx_pcalloc:
+     *      ctx->done = 0;
+     *      ctx->waiting_more_body = 0;
+     */
+
     ngx_http_set_ctx(r, ctx, ngx_http_form_input_module);
 
-    dd("start to read request_body");
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "http form_input start to read client request body, "
+#if defined(nginx_version) && nginx_version >= 8011
+                   "c:%d"
+#endif
+                   "a:%d",
+#if defined(nginx_version) && nginx_version >= 8011
+                   r->main->count,
+#endif
+                   r == r->connection->data);
 
     rc = ngx_http_read_client_request_body(r, ngx_http_form_input_post_read);
 
@@ -486,8 +517,12 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     if (rc == NGX_AGAIN) {
         ctx->waiting_more_body = 1;
+
         return NGX_DONE;
     }
+
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "http form_input has read the request body in one run");
 
     return NGX_DECLINED;
 }
@@ -497,7 +532,16 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
 {
     ngx_http_form_input_ctx_t     *ctx;
 
-    dd("ngx_http_post_read");
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "http form_input post read request body"
+#if defined(nginx_version) && nginx_version >= 8011
+                   "c:%d"
+#endif
+                   "a:%d",
+#if defined(nginx_version) && nginx_version >= 8011
+                   r->main->count,
+#endif
+                   r == r->connection->data);
 
     r->read_event_handler = ngx_http_request_empty_handler;
 
@@ -515,6 +559,7 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
     /* waiting_more_body my rewrite phase handler */
     if (ctx->waiting_more_body) {
         ctx->waiting_more_body = 0;
+
         ngx_http_core_run_phases(r);
     }
 }
