@@ -33,6 +33,7 @@ fi
 #tar -xzvf nginx-$version.tar.gz || exit 1
 #cp $root/../no-pool-nginx/nginx-$version-no_pool.patch ./ || exit 1
 #patch -p0 < nginx-$version-no_pool.patch || exit 1
+
 #patch -p0 < ~/work/nginx-$version-rewrite_phase_fix.patch || exit 1
 
 cd nginx-$version/
