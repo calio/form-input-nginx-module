@@ -20,7 +20,7 @@ update-readme
 test/Makefile
 test/blib
 test.sh
-t.sh
+go
 t/t.sh
 t/servroot/
 releng
@@ -62,4 +62,5 @@ src/handler.c
 src/handler.h
 util/bench
 pack
-all.sh
+all
+build10
