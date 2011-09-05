@@ -31,7 +31,7 @@ POST /bar1
 
 
 
-=== TEST 2:
+=== TEST 2: key not found
 --- config
 	location /bar2 {
 		set_form_input $foo bar;
@@ -48,7 +48,7 @@ foo
 
 
 
-=== TEST 3:
+=== TEST 3: key not found
 --- config
 	location /bar3 {
 		set_form_input $foo bar3;
@@ -64,7 +64,7 @@ foo=
 
 
 
-=== TEST 4:
+=== TEST 4: basic key=value
 --- config
 	location /bar4 {
 		set_form_input $foo foo;
@@ -80,7 +80,7 @@ bar
 
 
 
-=== TEST 5:
+=== TEST 5: test for spliter '&'
 --- config
 	location /bar5 {
 		set_form_input $foo foo;
@@ -96,7 +96,7 @@ POST /bar5
 
 
 
-=== TEST 6:
+=== TEST 6: test for spliter '&'
 --- config
 	location /bar6 {
 		set_form_input $foo foo;
@@ -112,7 +112,7 @@ foo&
 
 
 
-=== TEST 7:
+=== TEST 7: test for spliter '&'
 --- config
 	location /bar {
 		set_form_input $foo foo;
@@ -128,7 +128,7 @@ foo=&
 
 
 
-=== TEST 8:
+=== TEST 8: test for spliter '&'
 --- config
 	location /bar {
 		set_form_input $bar bar;
@@ -145,7 +145,7 @@ POST /bar
 
 
 
-=== TEST 9:
+=== TEST 9: test for spliter '&'
 --- config
 	location /bar {
 		set_form_input $bar bar;
@@ -161,7 +161,7 @@ POST /bar
 
 
 
-=== TEST 10:
+=== TEST 10: test for spliter '&' and '='
 --- config
 	location /bar {
 		set_form_input $bar bar;
@@ -177,7 +177,7 @@ POST /bar
 
 
 
-=== TEST 11:
+=== TEST 11: test for spliter '&' and '='
 --- config
 	location /bar {
 		set_form_input $bar bar;
@@ -193,7 +193,7 @@ foo
 
 
 
-=== TEST 12:
+=== TEST 12: test for spliter '&'
 --- config
 	location /bar {
 		set_form_input $bar bar;
@@ -209,7 +209,7 @@ POST /bar
 
 
 
-=== TEST 13:
+=== TEST 13: two keys
 --- config
 	location /bar {
 		set_form_input $bar1 foo1;
@@ -229,23 +229,7 @@ bar2
 
 
 
-=== TEST 14:
---- config
-	location /bar {
-		set_form_input $bar username;
-		echo $bar;
-	}
---- more_headers
-Content-Type: application/x-www-form-urlencoded
---- request
-POST /bar
-foo=bar
---- response_body eval
-"\n"
-
-
-
-=== TEST 15
+=== TEST 14 :GET request
 --- config
 	location /bar {
 		set_form_input $bar bar;
@@ -261,7 +245,7 @@ bar=foo
 
 
 
-=== TEST 16
+=== TEST 15 :no content type
 --- config
     location /bar {
         set_form_input $bar bar;
@@ -273,17 +257,4 @@ bar=I have no content type
 --- response_body eval
 "\n"
 
-
-
-=== TEST 17
---- config
-    location /bar {
-        set $bar value;
-        echo $bar;
-    }
---- request
-GET /bar
-bar=foo
---- response_body
-value
 
