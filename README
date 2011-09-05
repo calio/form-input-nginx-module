@@ -121,7 +121,7 @@ Copyright & License
 Changelog
     Changes with form-input-module v0.0.2
 
-      *) support set_fomr_input_multi
+      *) support set_form_input_multi
       *) support PUT method
 
     Changes with form-input-module v0.0.1
