@@ -64,4 +64,4 @@ src/handler.h
 util/bench
 pack
 all
-build1[01]
+build1[012]
