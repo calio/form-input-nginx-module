@@ -65,3 +65,5 @@ util/bench
 pack
 all
 build1[0123]
+Makefile
+*.plist
