@@ -67,3 +67,22 @@ Content-Type: application/x-www-form-urlencoded
 --- response_body
 'joe','secret'
 
+
+
+=== TEST 4: 100-Continue
+--- config
+    location /t {
+        set_form_input $foo bar;
+        echo $foo;
+    }
+--- more_headers
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Expect: 100-Continue
+--- request
+POST /t
+bar=32
+--- ignore_response
+--- no_error_log
+[alert]
+[error]
+
