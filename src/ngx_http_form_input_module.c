@@ -1,4 +1,6 @@
+#ifndef DDEBUG
 #define DDEBUG 0
+#endif
 #include "ddebug.h"
 
 #include <ndk.h>
@@ -23,8 +25,8 @@ typedef struct {
 #endif
 
 typedef struct {
-    ngx_flag_t          done:1;
-    ngx_flag_t          waiting_more_body:1;
+    unsigned          done:1;
+    unsigned          waiting_more_body:1;
 } ngx_http_form_input_ctx_t;
 
 
@@ -157,7 +159,7 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_OK;
     }
 
-    if (! ctx->done) {
+    if (!ctx->done) {
         dd("ctx not done");
         return NGX_OK;
     }
@@ -191,6 +193,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
         }
         value->data = (u_char *)array;
         value->len = sizeof(ngx_array_t);
+
     } else {
         value->data = NULL;
         value->len = 0;
@@ -287,6 +290,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
                 s->data = v;
                 s->len = p - v;
                 dd("array var:%.*s", (int) s->len, s->data);
+
             } else {
                 value->data = v;
                 value->len = p - v;
@@ -336,8 +340,7 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
 
     value++;
 
-    if (cf->args->nelts == 2)
-    {
+    if (cf->args->nelts == 2) {
         p = value->data;
         p++;
         s.len = value->len - 1;
@@ -440,13 +443,12 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
         return NGX_DONE;
     }
 
-    if (r->method != NGX_HTTP_POST && r->method != NGX_HTTP_PUT)
-    {
+    if (r->method != NGX_HTTP_POST && r->method != NGX_HTTP_PUT) {
         return NGX_DECLINED;
     }
 
-    if (r->headers_in.content_type == NULL ||
-            r->headers_in.content_type->value.data == NULL)
+    if (r->headers_in.content_type == NULL
+        || r->headers_in.content_type->value.data == NULL)
     {
         dd("content_type is %s", r->headers_in.content_type == NULL?"NULL":
                 "NOT NULL");
@@ -457,10 +459,12 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     value = r->headers_in.content_type->value;
 
     dd("r->headers_in.content_length_n:%d", (int) r->headers_in.content_length_n);
+
     /* just focus on x-www-form-urlencoded */
-    if (value.len < form_urlencoded_type_len ||
-            ngx_strncasecmp(value.data, (u_char *) form_urlencoded_type,
-                form_urlencoded_type_len) != 0)
+
+    if (value.len < form_urlencoded_type_len
+        || ngx_strncasecmp(value.data, (u_char *) form_urlencoded_type,
+                           form_urlencoded_type_len) != 0)
     {
         dd("not application/x-www-form-urlencoded");
         return NGX_DECLINED;
