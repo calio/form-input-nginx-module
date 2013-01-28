@@ -513,7 +513,8 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 }
 
 
-static void ngx_http_form_input_post_read(ngx_http_request_t *r)
+static void
+ngx_http_form_input_post_read(ngx_http_request_t *r)
 {
     ngx_http_form_input_ctx_t     *ctx;
 
@@ -540,4 +541,3 @@ static void ngx_http_form_input_post_read(ngx_http_request_t *r)
         ngx_http_core_run_phases(r);
     }
 }
-
