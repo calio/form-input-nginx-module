@@ -1,4 +1,4 @@
-# vi:filetype=
+# vi:set ft= ts=4 sw=4 et fdm=marker:
 
 use lib 'lib';
 use Test::Nginx::Socket;
@@ -15,10 +15,10 @@ __DATA__
 
 === TEST 1: charset postfix
 --- config
-	location /bar2 {
-		set_form_input $foo bar;
-		echo $foo;
-	}
+    location /bar2 {
+        set_form_input $foo bar;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded; charset=UTF-8
 --- request
@@ -32,10 +32,10 @@ bar=32
 
 === TEST 2: test case sensitivity
 --- config
-	location /bar2 {
-		set_form_input $foo bar;
-		echo $foo;
-	}
+    location /bar2 {
+        set_form_input $foo bar;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-Form-UrlencodeD
 --- request

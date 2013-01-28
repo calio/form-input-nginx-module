@@ -1,4 +1,4 @@
-# vi:filetype=perl
+# vi:set ft= ts=4 sw=4 et fdm=marker:
 
 use lib 'lib';
 use Test::Nginx::Socket;
@@ -17,10 +17,10 @@ __DATA__
 
 === TEST 1: blank body
 --- config
-	location /bar1 {
-		set_form_input $foo bar;
-		echo $foo;
-	}
+    location /bar1 {
+        set_form_input $foo bar;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -33,10 +33,10 @@ POST /bar1
 
 === TEST 2: key not found
 --- config
-	location /bar2 {
-		set_form_input $foo bar;
-		echo $foo;
-	}
+    location /bar2 {
+        set_form_input $foo bar;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -50,10 +50,10 @@ foo
 
 === TEST 3: key not found
 --- config
-	location /bar3 {
-		set_form_input $foo bar3;
-		echo $foo;
-	}
+    location /bar3 {
+        set_form_input $foo bar3;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -66,10 +66,10 @@ foo=
 
 === TEST 4: basic key=value
 --- config
-	location /bar4 {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar4 {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -82,10 +82,10 @@ bar
 
 === TEST 5: test for spliter '&'
 --- config
-	location /bar5 {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar5 {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -98,10 +98,10 @@ POST /bar5
 
 === TEST 6: test for spliter '&'
 --- config
-	location /bar6 {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar6 {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -114,10 +114,10 @@ foo&
 
 === TEST 7: test for spliter '&'
 --- config
-	location /bar {
-		set_form_input $foo foo;
-		echo $foo;
-	}
+    location /bar {
+        set_form_input $foo foo;
+        echo $foo;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -130,10 +130,10 @@ foo=&
 
 === TEST 8: test for spliter '&'
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -147,10 +147,10 @@ POST /bar
 
 === TEST 9: test for spliter '&'
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -163,10 +163,10 @@ POST /bar
 
 === TEST 10: test for spliter '&' and '='
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -179,10 +179,10 @@ POST /bar
 
 === TEST 11: test for spliter '&' and '='
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -195,10 +195,10 @@ foo
 
 === TEST 12: test for spliter '&'
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -211,12 +211,12 @@ POST /bar
 
 === TEST 13: two keys
 --- config
-	location /bar {
-		set_form_input $bar1 foo1;
-		set_form_input $bar2 foo2;
-		echo $bar1;
-		echo $bar2;
-	}
+    location /bar {
+        set_form_input $bar1 foo1;
+        set_form_input $bar2 foo2;
+        echo $bar1;
+        echo $bar2;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
@@ -231,10 +231,10 @@ bar2
 
 === TEST 14 :GET request
 --- config
-	location /bar {
-		set_form_input $bar bar;
-		echo $bar;
-	}
+    location /bar {
+        set_form_input $bar bar;
+        echo $bar;
+    }
 --- more_headers
 Content-Type: application/x-www-form-urlencoded
 --- request
