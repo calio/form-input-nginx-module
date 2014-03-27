@@ -3,9 +3,9 @@
 use lib 'lib';
 use Test::Nginx::Socket;
 
-#repeat_each(3);
+repeat_each(3);
 
-plan tests => repeat_each() * 2 * blocks();
+plan tests => repeat_each() * (3 * blocks() + 1);
 
 no_long_string();
 
@@ -27,6 +27,8 @@ bar=32
 --- response_body
 32
 --- timeout: 3
+--- no_error_log
+[error]
 
 
 
@@ -44,6 +46,8 @@ bar=32
 --- response_body
 32
 --- timeout: 3
+--- no_error_log
+[error]
 
 
 
@@ -66,6 +70,8 @@ columns=username,password&values=joe,secret
 Content-Type: application/x-www-form-urlencoded
 --- response_body
 'joe','secret'
+--- no_error_log
+[error]
 
 
 
@@ -82,6 +88,38 @@ Expect: 100-Continue
 POST /t
 bar=32
 --- ignore_response
+--- no_error_log
+[alert]
+[error]
+
+
+
+=== TEST 5: set_form_input_multi + missing Content-Type
+--- config
+location /modtest {
+        set_form_input_multi $val;
+        echo $val;
+}
+--- request
+POST /modtest
+val=foo&val=bar&val=baz
+--- response_body eval: "\n"
+--- no_error_log
+[alert]
+[error]
+
+
+
+=== TEST 6: bad set_form_input + missing Content-Type
+--- config
+location /modtest {
+        set_form_input $val foo;
+        echo $val;
+}
+--- request
+POST /modtest
+val=foo&val=bar&val=baz
+--- response_body eval: "\n"
 --- no_error_log
 [alert]
 [error]

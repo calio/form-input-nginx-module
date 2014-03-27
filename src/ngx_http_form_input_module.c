@@ -146,6 +146,9 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
 
     dd_enter();
 
+    res->data = NULL;
+    res->len = 0;
+
   /*  dd("set default return value");*/
 
     if (r->done) {
