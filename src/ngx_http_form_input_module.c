@@ -3,6 +3,7 @@
 #endif
 #include "ddebug.h"
 
+
 #include <ndk.h>
 #include <nginx.h>
 #include <ngx_config.h>
@@ -126,7 +127,7 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
         return NGX_OK;
     }
 
-    if (! ctx->done) {
+    if (!ctx->done) {
         dd("ctx not done");
         return NGX_OK;
     }
@@ -149,7 +150,7 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
     res->data = NULL;
     res->len = 0;
 
-  /*  dd("set default return value");*/
+    /* dd("set default return value"); */
 
     if (r->done) {
         return NGX_OK;
@@ -177,7 +178,7 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
  * read argument(s) with name arg_name and length arg_len into value variable,
  * if multi flag is set, multi arguments with name arg_name will be read and
  * stored in an ngx_array_t struct, this can be operated by directives in
- * array-var-nginx-module*/
+ * array-var-nginx-module */
 static ngx_int_t
 ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
     ngx_str_t *value, ngx_flag_t multi)
@@ -244,9 +245,11 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             p = ngx_copy(p, cl->buf->pos, cl->buf->last - cl->buf->pos);
         }
 
-        dd("p - buf = %d, last - buf = %d", (int) (p - buf), (int) (last - buf));
+        dd("p - buf = %d, last - buf = %d", (int) (p - buf),
+           (int) (last - buf));
 
-        dd("copied buf (len %d): %.*s", (int) len, (int) len, buf);
+        dd("copied buf (len %d): %.*s", (int) len, (int) len,
+           buf);
 
     } else {
         dd("XXX one buffer only");
@@ -302,12 +305,14 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             }
         }
     }
-/*
+
+#if 0
     if (multi) {
         value->data = (u_char *) array;
         value->len = sizeof(ngx_array_t);
     }
-*/
+#endif
+
     return NGX_OK;
 }
 
@@ -461,7 +466,8 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
 
     value = r->headers_in.content_type->value;
 
-    dd("r->headers_in.content_length_n:%d", (int) r->headers_in.content_length_n);
+    dd("r->headers_in.content_length_n:%d",
+       (int) r->headers_in.content_length_n);
 
     /* just focus on x-www-form-urlencoded */
 
