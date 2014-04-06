@@ -13,9 +13,9 @@ Installation
         Get the ngx_devel_kit source code from (http://github.com/simpl/ngx_devel_kit)
         Unpack the source code and build nginx with this module.
 
-        $ wget 'http://sysoev.ru/nginx/nginx-1.0.8.tar.gz'
-        $ tar -xzvf nginx-1.0.8.tar.gz
-        $ cd nginx-1.0.8/
+        $ wget 'http://sysoev.ru/nginx/nginx-1.5.12.tar.gz'
+        $ tar -xzvf nginx-1.5.12.tar.gz
+        $ cd nginx-1.5.12/
 
         $ git-clone http://github.com/simpl/ngx_devel_kit.git
         $ git-clone http://github.com/calio/form-input-nginx-module.git
@@ -68,6 +68,10 @@ Limitations
 Compatibility
     The following versions of Nginx should work with this module:
 
+    *   1.5.x (last tested: 1.5.12)
+
+    *   1.4.x (last tested: 1.4.6)
+
     *   1.1.x (last tested: 1.1.5)
 
     *   1.0.x (last tested: 1.0.8)
@@ -88,12 +92,9 @@ but a small patch can fix this issue for nginx 0.8.53:
 This patch may also be applied cleanly for other versions of nginx 0.8.42 ~ 0.8.53 :)
 
 Copyright & License
-    Copyright (c) 2010, 2011, Taobao Inc., Alibaba Group ( http://www.taobao.com
-    ).
-
     Copyright (c) 2010, 2011, Jiale "calio" Zhi <vipcalio@gmail.com>.
 
-    Copyright (c) 2010, 2011, Yichun "agentzh" Zhang <agentzh@gmail.com>.
+    Copyright (c) 2010-2014, Yichun "agentzh" Zhang <agentzh@gmail.com>, CloudFlare Inc.
 
     This module is licensed under the terms of the BSD license.
 
