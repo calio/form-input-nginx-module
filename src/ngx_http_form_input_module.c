@@ -340,10 +340,10 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
         ngx_strncmp(value->data, "set_form_input_multi", value->len) == 0)
     {
         dd("use ngx_http_form_input_multi");
-        filter.func = ngx_http_set_form_input_multi;
+        filter.func = (void *) ngx_http_set_form_input_multi;
 
     } else {
-        filter.func = ngx_http_set_form_input;
+        filter.func = (void *) ngx_http_set_form_input;
     }
 
     value++;
