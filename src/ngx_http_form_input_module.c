@@ -36,7 +36,6 @@ static ngx_int_t ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
 static char *ngx_http_set_form_input_conf_handler(ngx_conf_t *cf,
     ngx_command_t *cmd, void *conf);
 
-ngx_str_t empty_string = ngx_string("");
 
 #if 0
 
@@ -114,8 +113,7 @@ ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
     dd_enter();
 
     dd("set default return value");
-    res->data = empty_string.data;
-    res->len = empty_string.len;
+    ngx_str_set(res, "");
 
     if (r->done) {
         dd("request done");
@@ -150,8 +148,7 @@ ngx_http_set_form_input_multi(ngx_http_request_t *r, ngx_str_t *res,
     dd_enter();
 
     dd("set default return value");
-    res->data = empty_string.data;
-    res->len = empty_string.len;
+    ngx_str_set(res, "");
 
     /* dd("set default return value"); */
 
@@ -202,8 +199,7 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
         value->len = sizeof(ngx_array_t);
 
     } else {
-        value->data = empty_string.data;
-        value->len = empty_string.len;
+        ngx_str_set(value, "");
     }
 
     /* we read data from r->request_body->bufs */
