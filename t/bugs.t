@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(3);
 
-plan tests => repeat_each() * (3 * blocks() + 1);
+plan tests => repeat_each() * (3 * blocks() + 3);
 
 no_long_string();
 
@@ -120,6 +120,50 @@ location /modtest {
 POST /modtest
 val=foo&val=bar&val=baz
 --- response_body eval: "\n"
+--- no_error_log
+[alert]
+[error]
+
+
+
+=== TEST 7: working with if and regex
+--- config
+location /modtest {
+        set_form_input $foo foo;
+        if ($foo ~* ^ab+c$) {
+            echo $foo;
+        }
+        echo $foo;
+        echo done;
+}
+--- request
+POST /modtest
+val=foo&val=bar&val=baz
+--- more_headers
+Content-Type: application/x-www-form-urlencoded
+--- response_body eval: "\ndone\n"
+--- no_error_log
+[alert]
+[error]
+
+
+
+=== TEST 8: content type is not application/x-www-form-urlencoded
+--- config
+location /modtest {
+        set_form_input $foo foo;
+        if ($foo ~* ^ab+c$) {
+            echo $foo;
+        }
+        echo $foo;
+        echo done;
+}
+--- request
+POST /modtest
+val=foo&val=bar&val=baz
+--- more_headers
+Content-Type: multipart/form-data
+--- response_body eval: "\ndone\n"
 --- no_error_log
 [alert]
 [error]
