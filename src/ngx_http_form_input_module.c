@@ -530,8 +530,6 @@ ngx_http_form_input_post_read(ngx_http_request_t *r)
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "http form_input post read request body");
 
-    r->read_event_handler = ngx_http_request_empty_handler;
-
     ctx = ngx_http_get_module_ctx(r, ngx_http_form_input_module);
 
     ctx->done = 1;
