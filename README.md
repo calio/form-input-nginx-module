@@ -134,7 +134,7 @@ Copyright & License
 
 Copyright (c) 2010, 2011, Jiale "calio" Zhi <vipcalio@gmail.com>.
 
-Copyright (c) 2010-2014, Yichun "agentzh" Zhang <agentzh@gmail.com>, CloudFlare Inc.
+Copyright (c) 2010-2016, Yichun "agentzh" Zhang <agentzh@gmail.com>, CloudFlare Inc.
 
 This module is licensed under the terms of the BSD license.
 
