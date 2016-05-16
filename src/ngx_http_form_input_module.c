@@ -15,15 +15,6 @@
 #define form_urlencoded_type_len (sizeof(form_urlencoded_type) - 1)
 
 
-#if 0
-
-typedef struct {
-    ngx_flag_t    enabled;
-} ngx_http_form_input_loc_conf_t;
-
-#endif
-
-
 typedef struct {
     unsigned        used;  /* :1 */
 } ngx_http_form_input_main_conf_t;
@@ -40,16 +31,6 @@ static ngx_int_t ngx_http_set_form_input(ngx_http_request_t *r, ngx_str_t *res,
 static char *ngx_http_set_form_input_conf_handler(ngx_conf_t *cf,
     ngx_command_t *cmd, void *conf);
 static void *ngx_http_form_input_create_main_conf(ngx_conf_t *cf);
-
-
-#if 0
-
-static void *ngx_http_form_input_create_loc_conf(ngx_conf_t *cf);
-static char *ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent,
-    void *child);
-
-#endif
-
 static ngx_int_t ngx_http_form_input_init(ngx_conf_t *cf);
 static ngx_int_t ngx_http_form_input_handler(ngx_http_request_t *r);
 static void ngx_http_form_input_post_read(ngx_http_request_t *r);
@@ -88,7 +69,7 @@ static ngx_http_module_t ngx_http_form_input_module_ctx = {
     NULL,                                   /* merge server configuration */
 
     NULL,                                   /* create location configuration */
-    NULL                                   /* merge location configuration */
+    NULL                                    /* merge location configuration */
 };
 
 
@@ -371,32 +352,6 @@ ngx_http_set_form_input_conf_handler(ngx_conf_t *cf, ngx_command_t *cmd,
 }
 
 
-#if 0
-
-static void *
-ngx_http_form_input_create_loc_conf(ngx_conf_t *cf)
-{
-    ngx_http_form_input_loc_conf_t *conf;
-
-    conf = ngx_palloc(cf->pool, sizeof(ngx_http_form_input_loc_conf_t));
-
-    if (conf == NULL) {
-        return NULL;
-    }
-
-    return conf;
-}
-
-
-static char *
-ngx_http_form_input_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
-{
-    return NGX_CONF_OK;
-}
-
-#endif
-
-
 /* register a new rewrite phase handler */
 static ngx_int_t
 ngx_http_form_input_init(ngx_conf_t *cf)
@@ -405,16 +360,6 @@ ngx_http_form_input_init(ngx_conf_t *cf)
     ngx_http_handler_pt             *h;
     ngx_http_core_main_conf_t       *cmcf;
     ngx_http_form_input_main_conf_t *fmcf;
-
-    /*
-    ngx_http_form_input_loc_conf_t  *lcf;
-
-    lcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_form_input_module);
-    if (lcf->enabled != 1) {
-        dd("set_form_input not used");
-        return NGX_OK;
-    }
-    */
 
     fmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_form_input_module);
 
