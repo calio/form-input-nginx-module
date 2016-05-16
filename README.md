@@ -28,12 +28,12 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.9.7 (see [nginx compatibility](#compatibility)), and then build the source with this module:
+the version 1.9.15 (see [nginx compatibility](#compatibility)), and then build the source with this module:
 
 ```bash
-wget 'http://nginx.org/download/nginx-1.9.7.tar.gz'
-tar -xzvf nginx-1.9.7.tar.gz
-cd nginx-1.9.7/
+wget 'http://nginx.org/download/nginx-1.9.15.tar.gz'
+tar -xzvf nginx-1.9.15.tar.gz
+cd nginx-1.9.15/
 
 ./configure --add-module=/path/to/ngx_devel_kit \
     --add-module=/path/to/form-input-nginx-module
@@ -116,7 +116,7 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
-* 1.9.x (last tested: 1.9.7)
+* 1.9.x (last tested: 1.9.15)
 * 1.8.x
 * 1.7.x (last tested: 1.7.4)
 * 1.6.x
