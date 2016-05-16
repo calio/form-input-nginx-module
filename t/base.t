@@ -229,7 +229,7 @@ bar2
 
 
 
-=== TEST 14 :GET request
+=== TEST 14: GET request
 --- config
     location /bar {
         set_form_input $bar bar;
@@ -245,7 +245,7 @@ bar=foo
 
 
 
-=== TEST 15 :no content type
+=== TEST 15: no content type
 --- config
     location /bar {
         set_form_input $bar bar;

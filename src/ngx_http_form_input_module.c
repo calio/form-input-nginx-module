@@ -216,9 +216,9 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
 
             if (b->in_file) {
                 ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                        "form-input: in-file buffer found. aborted. "
-                        "consider increasing your client_body_buffer_size "
-                        "setting");
+                              "form-input: in-file buffer found. aborted. "
+                              "consider increasing your "
+                              "client_body_buffer_size setting");
 
                 return NGX_OK;
             }
@@ -277,7 +277,8 @@ ngx_http_form_input_arg(ngx_http_request_t *r, u_char *arg_name, size_t arg_len,
             dd("v = %d...", (int) (v - buf));
 
             dd("buf now (len %d): %.*s",
-                    (int) (last - v), (int) (last - v), v);
+               (int) (last - v), (int) (last - v), v);
+
             p = ngx_strlchr(v, last, '&');
             if (p == NULL) {
                 dd("& not found, pointing it to last...");
@@ -457,8 +458,7 @@ ngx_http_form_input_handler(ngx_http_request_t *r)
     if (r->headers_in.content_type == NULL
         || r->headers_in.content_type->value.data == NULL)
     {
-        dd("content_type is %s", r->headers_in.content_type == NULL?"NULL":
-                "NOT NULL");
+        dd("content_type is %p", r->headers_in.content_type);
 
         return NGX_DECLINED;
     }
